@@ -1,9 +1,9 @@
 """
-main.py  (LangGraph version)
+main.py  
 
 Voice-controlled email assistant.
 Each loop iteration runs one full LangGraph email session.
-Say 'stop', 'exit', 'quit', 'bye', 'thank you', or 'goodbye' to exit.
+Say 'stop', 'exit', 'quit', 'bye', 'thank you', or 'goodbye' cto exit.
 """
 
 from record import record_voice
