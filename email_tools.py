@@ -1,6 +1,6 @@
-# email_tools.py
-
 """
+email_tools.py
+
 Drafts, edits, and sends emails.
 - Uses Ollama/Mistral to draft and edit email content
 - Uses Microsoft Graph API to send the email
@@ -67,6 +67,14 @@ Important rules:
 - Do NOT add apologies unless the user explicitly mentions apologizing
 - Do NOT add extra politeness or explanations
 - Keep the content as close as possible to the original text
+- The body must start with \"Hi {recipient_name},\"
+- Do NOT include any signature, sign-off name, placeholder, or closing name.
+
+Return ONLY valid JSON:
+{{
+  "subject": "subject here",
+  "body": "body here"
+}}
 
 Return ONLY valid JSON:
 {{
