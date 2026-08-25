@@ -1,15 +1,12 @@
 """
 agent_graph.py
 
-Dhvani — Voice Email Assistant (LangGraph version)
-Replaces agent.py with a proper LangGraph state machine.
+Dhvani — Voice Email Assistant with LangGraph 
 
 Graph nodes:
   listen_and_greet  → detect_intent → resolve_recipient
   → draft_email → confirm_loop → send_email | cancel
 
-All other files (record.py, transcribe.py, email_tools.py,
-people_search.py, speak_script.py, ms_auth.py) are unchanged.
 """
 
 from __future__ import annotations
@@ -26,9 +23,7 @@ from speak_script import speak
 from transcribe import transcribe_audio
 
 
-# ---------------------------------------------------------------------------
-# State
-# ---------------------------------------------------------------------------
+# State 
 
 class EmailState(TypedDict, total=False):
     # set by listen_and_greet
@@ -50,9 +45,7 @@ class EmailState(TypedDict, total=False):
     status: Literal["sent", "cancelled", "error", "no_intent", "no_recipient"]
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 
 def _is_meaningless(text: str) -> bool:
     cleaned = text.strip().replace(".", "").replace(",", "").replace("?", "")
@@ -75,10 +68,7 @@ def _speak_draft(state: EmailState) -> None:
             speak(part + ".")
     speak("Should I send it, edit it, or cancel?")
 
-
-# ---------------------------------------------------------------------------
 # Node: listen_and_greet
-# ---------------------------------------------------------------------------
 
 def listen_and_greet(state: EmailState) -> EmailState:
     """
@@ -90,9 +80,7 @@ def listen_and_greet(state: EmailState) -> EmailState:
     return {"user_text": user_text}
 
 
-# ---------------------------------------------------------------------------
 # Node: detect_intent
-# ---------------------------------------------------------------------------
 
 def detect_intent(state: EmailState) -> EmailState:
     """
@@ -135,9 +123,7 @@ def _route_after_intent(state: EmailState) -> str:
     return "resolve_recipient"
 
 
-# ---------------------------------------------------------------------------
 # Node: resolve_recipient
-# ---------------------------------------------------------------------------
 
 def resolve_recipient(state: EmailState) -> EmailState:
     """
@@ -200,9 +186,7 @@ def _route_after_resolve(state: EmailState) -> str:
     return "draft_email_node"
 
 
-# ---------------------------------------------------------------------------
 # Node: draft_email_node
-# ---------------------------------------------------------------------------
 
 def draft_email_node(state: EmailState) -> EmailState:
     """
@@ -214,9 +198,7 @@ def draft_email_node(state: EmailState) -> EmailState:
     return {"draft": draft}
 
 
-# ---------------------------------------------------------------------------
 # Node: confirm_loop
-# ---------------------------------------------------------------------------
 
 def confirm_loop(state: EmailState) -> EmailState:
     """
@@ -259,10 +241,7 @@ def _route_after_confirm(state: EmailState) -> str:
         return "cancel_node"
     return "confirm_loop"   # includes 'edit' — re-reads updated draft
 
-
-# ---------------------------------------------------------------------------
 # Node: send_email_node
-# ---------------------------------------------------------------------------
 
 def send_email_node(state: EmailState) -> EmailState:
     success = send_email(
@@ -277,19 +256,13 @@ def send_email_node(state: EmailState) -> EmailState:
     speak("I couldn't send the email. Please try again later.")
     return {"status": "error"}
 
-
-# ---------------------------------------------------------------------------
 # Node: cancel_node
-# ---------------------------------------------------------------------------
 
 def cancel_node(state: EmailState) -> EmailState:
     speak("Okay, I've cancelled the email.")
     return {"status": "cancelled"}
 
-
-# ---------------------------------------------------------------------------
 # Build the graph
-# ---------------------------------------------------------------------------
 
 def build_graph() -> StateGraph:
     g = StateGraph(EmailState)
@@ -341,10 +314,6 @@ def build_graph() -> StateGraph:
 
     return g.compile()
 
-
-# ---------------------------------------------------------------------------
-# Public entry point (called from main.py)
-# ---------------------------------------------------------------------------
 
 email_graph = build_graph()
 
